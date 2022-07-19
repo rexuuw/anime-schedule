@@ -12,6 +12,9 @@
   let satAni: item[] = [];
   let sunAni: item[] = [];
 
+  let date = new Date();
+  let today = date.getDay();
+
   $: list;
 
 
@@ -106,7 +109,7 @@
 
   <section class="weekWrapper">
     <div class="dayWrapper">
-      <h1>Monday</h1>
+      <h1 class="{today === 1 ? 'today' : ''}">Monday</h1>
       <input type="text" placeholder="Enter title..." id="mon" on:change={addItem}>
       <ul class="listWrapper">
         {#each monAni as anime, i}
@@ -115,7 +118,7 @@
       </ul>
     </div>
     <div class="dayWrapper">
-      <h1>Tuesday</h1>
+      <h1 class="{today === 2 ? 'today' : ''}">Tuesday</h1>
       <input type="text" placeholder="Enter title..." id="tue" on:change={addItem}>
       <ul class="listWrapper">
         {#each tueAni as anime, i}
@@ -124,7 +127,7 @@
       </ul>
     </div>
     <div class="dayWrapper">
-      <h1>Wednesday</h1>
+      <h1 class="{today === 3 ? 'today' : ''}">Wednesday</h1>
       <input type="text" placeholder="Enter title..." id="wed" on:change={addItem}>
       <ul class="listWrapper">
         {#each wedAni as anime, i}
@@ -133,7 +136,7 @@
       </ul>
     </div>
     <div class="dayWrapper">
-      <h1>Thursday</h1>
+      <h1 class="{today === 4 ? 'today' : ''}">Thursday</h1>
       <input type="text" placeholder="Enter title..." id="thu" on:change={addItem}>
       <ul class="listWrapper">
         {#each thuAni as anime, i}
@@ -142,7 +145,7 @@
       </ul>
     </div>
     <div class="dayWrapper">
-      <h1>Friday</h1>
+      <h1 class="{today === 5 ? 'today' : ''}">Friday</h1>
       <input type="text" placeholder="Enter title..." id="fri" on:change={addItem}>
       <ul class="listWrapper">
         {#each friAni as anime, i}
@@ -151,7 +154,7 @@
       </ul>
     </div>
     <div class="dayWrapper">
-      <h1>Saturday</h1>
+      <h1 class="{today === 6 ? 'today' : ''}">Saturday</h1>
       <input type="text" placeholder="Enter title..." id="sat" on:change={addItem}>
       <ul class="listWrapper">
         {#each satAni as anime, i}
@@ -160,7 +163,7 @@
       </ul>
     </div>
     <div class="dayWrapper">
-      <h1>Sunday</h1>
+      <h1 class="{today === 7 ? 'today' : ''}">Sunday</h1>
       <input type="text" placeholder="Enter title..." id="sun" on:change={addItem}>
       <ul class="listWrapper">
         {#each sunAni as anime, i}
@@ -173,9 +176,6 @@
 
 <style>
   main {
-    /* margin-right: auto;
-    margin-left: auto;
-    max-width: 1000px; */
     height: 100%;
   }
 
@@ -215,6 +215,10 @@
   .listWrapper {
     width: 100%;
     padding-inline: 7px;
+  }
+
+  .today {
+    color: rgb(133, 0, 66);
   }
 
 </style>
