@@ -1,16 +1,16 @@
 <script lang="ts">
 	import ListEntry from "./components/ListEntry.svelte";
-  import { item } from "./model/item";
+  import { anime } from "./model/anime";
   import { onMount, onDestroy } from "svelte";
   
-  let list: item[] = [];
-  let monAni = [];
-  let tueAni: item[] = [];
-  let wedAni: item[] = [];
-  let thuAni: item[] = [];
-  let friAni: item[] = [];
-  let satAni: item[] = [];
-  let sunAni: item[] = [];
+  let monAni: anime[] = [];
+  let tueAni: anime[] = [];
+  let wedAni: anime[] = [];
+  let thuAni: anime[] = [];
+  let friAni: anime[] = [];
+  let satAni: anime[] = [];
+  let sunAni: anime[] = [];
+  let list = [sunAni, monAni, tueAni, wedAni, thuAni, friAni, satAni];
 
   let date = new Date();
   let today = date.getDay();
@@ -18,88 +18,160 @@
   $: list;
 
 
-  function addItem(event) {
-    if(event.key = 'Enter') {
-
-      switch (event.target.id) {
-        case "mon":
-          monAni = [...monAni, new item(event.target.value)];
-          localStorage.setItem("monAni", JSON.stringify(monAni));
-          event.target.value = '';
-          break;
-        case "tue":
-          tueAni = [...tueAni, new item(event.target.value)];
-          localStorage.setItem("tueAni", JSON.stringify(tueAni));
-          event.target.value = '';
-          break;
-        case "wed":
-          wedAni = [...wedAni, new item(event.target.value)];
-          localStorage.setItem("wedAni", JSON.stringify(wedAni));
-          event.target.value = '';
-          break;
-        case "thu":
-          thuAni = [...thuAni, new item(event.target.value)];
-          localStorage.setItem("thuAni", JSON.stringify(thuAni));
-          event.target.value = '';
-          break;
-        case "fri":
-          friAni = [...friAni, new item(event.target.value)];
-          localStorage.setItem("friAni", JSON.stringify(friAni));
-          event.target.value = '';
-          break;
-        case "sat":
-          satAni = [...satAni, new item(event.target.value)];
-          localStorage.setItem("satAni", JSON.stringify(satAni));
-          event.target.value = '';
-          break;
-        case "sun":
-          sunAni = [...sunAni, new item(event.target.value)];
-          localStorage.setItem("sunAni", JSON.stringify(sunAni));
-          event.target.value = '';
-          break;
-        default:
-          break;
-      }
-      
-    }
+  function sortAnime(fetchedAnime, day) {
+    return fetchedAnime.filter(item => {
+      let airDate = new Date(item.nextAiringEpisode.airingAt * 1000);
+      return airDate.getDay() === day;
+    })
   }
+
+  function handleResponse(response) {
+    return response.json().then(function (json) {
+      return response.ok ? json : Promise.reject(json);
+    });
+  }
+
+  function handleData(data) {
+    let fetchedAnime = data.data.Page.media;
+
+    for (let i = 0; i < list.length; i++) {
+      list[i] = sortAnime(fetchedAnime, i);
+    }
+
+    console.log(list);
+  }
+
+  function handleError(error) {
+    alert('Error, check console');
+    console.error(error);
+  }
+
+  var query = `
+    query(
+      $page:Int = 10 
+      $id:Int 
+      $type:MediaType 
+      $isAdult:Boolean = false 
+      $search:String 
+      $format:[MediaFormat]
+      $status:MediaStatus 
+      $countryOfOrigin:CountryCode 
+      $source:MediaSource 
+      $season:MediaSeason 
+      $seasonYear:Int 
+      $year:String 
+      $onList:Boolean 
+      $yearLesser:FuzzyDateInt 
+      $yearGreater:FuzzyDateInt 
+      $episodeLesser:Int 
+      $episodeGreater:Int 
+      $durationLesser:Int 
+      $durationGreater:Int 
+      $chapterLesser:Int 
+      $chapterGreater:Int 
+      $volumeLesser:Int 
+      $volumeGreater:Int 
+      $licensedBy:[Int]
+      $isLicensed:Boolean 
+      $genres:[String]
+      $excludedGenres:[String]
+      $tags:[String]
+      $excludedTags:[String]
+      $minimumTagRank:Int 
+      $sort:[MediaSort]=[POPULARITY_DESC,SCORE_DESC])
+      {
+        Page(
+          page:$page,
+          perPage:100
+          )
+          {
+            pageInfo
+            {
+              total perPage currentPage lastPage hasNextPage
+            }
+        media(
+          id:$id 
+          type:$type 
+          season:$season 
+          format_in:$format 
+          status:$status 
+          countryOfOrigin:$countryOfOrigin 
+          source:$source 
+          search:$search 
+          onList:$onList 
+          seasonYear:$seasonYear 
+          startDate_like:$year 
+          startDate_lesser:$yearLesser 
+          startDate_greater:$yearGreater 
+          episodes_lesser:$episodeLesser 
+          episodes_greater:$episodeGreater 
+          duration_lesser:$durationLesser 
+          duration_greater:$durationGreater 
+          chapters_lesser:$chapterLesser 
+          chapters_greater:$chapterGreater 
+          volumes_lesser:$volumeLesser 
+          volumes_greater:$volumeGreater 
+          licensedById_in:$licensedBy 
+          isLicensed:$isLicensed 
+          genre_in:$genres 
+          genre_not_in:$excludedGenres 
+          tag_in:$tags 
+          tag_not_in:$excludedTags 
+          minimumTagRank:$minimumTagRank 
+          sort:$sort 
+          isAdult:$isAdult)
+          {
+            id 
+            title{userPreferred}
+            coverImage{extraLarge large color}
+            startDate{year month day}
+            endDate{year month day}
+            bannerImage 
+            season 
+            seasonYear 
+            description 
+            type 
+            format
+            episodes 
+            duration 
+            genres 
+            averageScore 
+            popularity 
+            nextAiringEpisode{airingAt timeUntilAiring episode}
+          }
+        }
+      }
+    `;
+
+  // Define our query variables and values that will be used in the query request
+  var variables = {
+    page: 1,
+    season: "FALL",
+    seasonYear: 2022,
+    format: "TV",
+    type: "ANIME"
+  };
+
+  // Define the config we'll need for our Api request
+  var url = 'https://graphql.anilist.co',
+    options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        query: query,
+        variables: variables
+      })
+    };
 
 
   onMount(() => {
-    monAni = JSON.parse(localStorage.getItem("monAni"));
-    if (monAni == null) {
-      monAni = [];
-    }
-
-    tueAni = JSON.parse(localStorage.getItem("tueAni"));
-    if (tueAni == null) {
-      tueAni = [];
-    }
-
-    wedAni = JSON.parse(localStorage.getItem("wedAni"));
-    if (wedAni == null) {
-      wedAni = [];
-    }
-
-    thuAni = JSON.parse(localStorage.getItem("thuAni"));
-    if (thuAni == null) {
-      thuAni = [];
-    }
-
-    friAni = JSON.parse(localStorage.getItem("friAni"));
-    if (friAni == null) {
-      friAni = [];
-    }
-
-    satAni = JSON.parse(localStorage.getItem("satAni"));
-    if (satAni == null) {
-      satAni = [];
-    }
-
-    sunAni = JSON.parse(localStorage.getItem("sunAni"));
-    if (sunAni == null) {
-      sunAni = [];
-    }
+    // Make the HTTP Api request
+    fetch(url, options).then(handleResponse)
+      .then(handleData)
+      .catch(handleError);
   });
 
   
@@ -110,64 +182,57 @@
   <section class="weekWrapper">
     <div class="dayWrapper">
       <h1 class="{today === 1 ? 'today' : ''}">Monday</h1>
-      <input type="text" placeholder="Enter title..." id="mon" on:change={addItem}>
       <ul class="listWrapper">
-        {#each monAni as anime, i}
-          <ListEntry item={anime} index={i} bind:list={monAni} day="mon"/>
+        {#each list[1] as anime, i}
+          <ListEntry anime={anime} index={i} bind:list={monAni} day="mon"/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
       <h1 class="{today === 2 ? 'today' : ''}">Tuesday</h1>
-      <input type="text" placeholder="Enter title..." id="tue" on:change={addItem}>
       <ul class="listWrapper">
-        {#each tueAni as anime, i}
-          <ListEntry item={anime} index={i} bind:list={tueAni} day="tue"/>
+        {#each list[2] as anime, i}
+          <ListEntry anime={anime} index={i} bind:list={tueAni} day="tue"/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
       <h1 class="{today === 3 ? 'today' : ''}">Wednesday</h1>
-      <input type="text" placeholder="Enter title..." id="wed" on:change={addItem}>
       <ul class="listWrapper">
-        {#each wedAni as anime, i}
-          <ListEntry item={anime} index={i} bind:list={wedAni} day="wed"/>
+        {#each list[3] as anime, i}
+          <ListEntry anime={anime} index={i} bind:list={wedAni} day="wed"/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
       <h1 class="{today === 4 ? 'today' : ''}">Thursday</h1>
-      <input type="text" placeholder="Enter title..." id="thu" on:change={addItem}>
       <ul class="listWrapper">
-        {#each thuAni as anime, i}
-          <ListEntry item={anime} index={i} bind:list={thuAni} day="thu"/>
+        {#each list[4] as anime, i}
+          <ListEntry anime={anime} index={i} bind:list={thuAni} day="thu"/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
       <h1 class="{today === 5 ? 'today' : ''}">Friday</h1>
-      <input type="text" placeholder="Enter title..." id="fri" on:change={addItem}>
       <ul class="listWrapper">
-        {#each friAni as anime, i}
-          <ListEntry item={anime} index={i} bind:list={friAni} day="fri"/>
+        {#each list[5] as anime, i}
+          <ListEntry anime={anime} index={i} bind:list={friAni} day="fri"/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
       <h1 class="{today === 6 ? 'today' : ''}">Saturday</h1>
-      <input type="text" placeholder="Enter title..." id="sat" on:change={addItem}>
       <ul class="listWrapper">
-        {#each satAni as anime, i}
-          <ListEntry item={anime} index={i} bind:list={satAni} day="sat"/>
+        {#each list[6] as anime, i}
+          <ListEntry anime={anime} index={i} bind:list={satAni} day="sat"/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
-      <h1 class="{today === 7 ? 'today' : ''}">Sunday</h1>
-      <input type="text" placeholder="Enter title..." id="sun" on:change={addItem}>
+      <h1 class="{today === 0 ? 'today' : ''}">Sunday</h1>
       <ul class="listWrapper">
-        {#each sunAni as anime, i}
-          <ListEntry item={anime} index={i} bind:list={sunAni} day="sun"/>
+        {#each list[0] as anime, i}
+          <ListEntry anime={anime} index={i} bind:list={sunAni} day="sun"/>
         {/each}
       </ul>
     </div>
