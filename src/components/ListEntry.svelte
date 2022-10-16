@@ -7,11 +7,10 @@
   export let day;
 
   let today = new Date();
-  let releaseDate = new Date(anime.nextAiringEpisode.airingAt * 1000);
+  let releaseDate = new Date((anime.nextAiringEpisode.airingAt + 3600) * 1000 );
   let dayDiff = Math.ceil(Math.abs(releaseDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) - 1;
 
   let progress = (anime.nextAiringEpisode.episode - 1) / anime.episodes * 100;
-  console.log(progress)
 
   // let link : string = anime.title.userPreffered.toLowerCase().replace(/\s+/g, "-");
 
@@ -58,7 +57,9 @@
     </span>
     <span class="descr">
       {#if anime.nextAiringEpisode.episode === 1}
-        <p>Releasing: {releaseDate.toLocaleString('de-DE', { timeZone: 'CET' })} > in {dayDiff} Days</p>
+        <p>Releasing: {releaseDate.toLocaleString('de-DE', { timeZone: 'CET' })} -> in {dayDiff} Days</p>
+      {:else}
+        <p>Airing: {releaseDate.toLocaleString('de-DE', {hour: '2-digit', minute: "2-digit"})}</p>
       {/if}
       {@html anime.description || ""}
     </span>
@@ -87,7 +88,7 @@
   }
 
   .dragButton svg {
-    transition: transform 0.3s;
+    transition: transform 0.15s;
   }
 
   main:focus-within .dragButton svg {
