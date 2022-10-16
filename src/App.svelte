@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ListEntry from "./components/ListEntry.svelte";
-  import { anime } from "./model/anime";
+  import type { anime } from "./model/anime";
   import { onMount, onDestroy } from "svelte";
   
   let monAni: anime[] = [];
@@ -38,7 +38,7 @@
       list[i] = sortAnime(fetchedAnime, i);
     }
 
-    console.log(list);
+    console.log("Season:", variables.season, variables.seasonYear, "\n", list);
   }
 
   function handleError(error) {
@@ -258,27 +258,9 @@
     background-color: rgb(27, 27, 27);
   }
 
-  .dayWrapper input {
-    width: 95%;
-    margin-bottom: 10px;
-    padding: 0.6em;
-    font-size: 1em;
-    color: #fff;
-    outline: none;
-    border: 1px solid rgb(167, 167, 167);
-    border-radius: 5px;
-    box-shadow: inset 2px 2px 5px rgb(0, 0, 0, 0.35);
-    background-color: transparent;
-    transition: all 0.3s;
-  }
-
-  .dayWrapper input:focus {
-    border: 1px solid #fff;
-    box-shadow: 2px 4px 4px rgba(94, 94, 94, 0.5);
-  }
-
   .listWrapper {
     width: 100%;
+    margin-top: 0;
     padding-inline: 7px;
   }
 
