@@ -20,8 +20,13 @@
 
   function sortAnime(fetchedAnime, day) {
     return fetchedAnime.filter(item => {
-      let airDate = new Date(item.nextAiringEpisode.airingAt * 1000);
-      return airDate.getDay() === day;
+      try {
+        let airDate = new Date(item.nextAiringEpisode.airingAt * 1000);
+        return airDate.getDay() === day;
+      } catch (error) {
+        console.error("An error occurred while sorting the following item: \n", item, "\n", error);
+        return false;
+      }
     })
   }
 
@@ -265,7 +270,7 @@
   }
 
   .today {
-    color: rgb(133, 0, 66);
+    color: rgb(206, 1, 103);
   }
 
 </style>

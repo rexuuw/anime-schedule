@@ -57,7 +57,7 @@
     </span>
     <span class="descr">
       {#if anime.nextAiringEpisode.episode === 1}
-        <p>Releasing: {releaseDate.toLocaleString('de-DE', { timeZone: 'CET' })} -> in {dayDiff} Days</p>
+        <p>Releasing: {releaseDate.toLocaleString('de-DE', { timeZone: 'CET', hour: '2-digit', minute: "2-digit"})} -> in {dayDiff} Days</p>
       {:else}
         <p>Airing: {releaseDate.toLocaleString('de-DE', {hour: '2-digit', minute: "2-digit"})}</p>
       {/if}
@@ -254,7 +254,7 @@
     height: 1.5em;
     padding-inline: 0.5rem;
     padding-block: 0 1px;
-    border: 1px solid rgb(233, 128, 7);
+    border: 1px solid rgb(206, 1, 103);
     border-radius: 25px;
     display: flex;
     justify-content: center;
