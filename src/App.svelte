@@ -151,8 +151,8 @@
   // Define our query variables and values that will be used in the query request
   var variables = {
     page: 1,
-    season: "FALL",
-    seasonYear: 2022,
+    season: "WINTER",
+    seasonYear: 2023,
     format: "TV",
     type: "ANIME"
   };
