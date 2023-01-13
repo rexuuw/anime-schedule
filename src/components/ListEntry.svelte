@@ -3,9 +3,6 @@
   import watchListStore from "../stores/watchList";
 
   export let anime;
-  export let index;
-  export let list;
-  export let day;
   export let watching;
   let expanded : boolean = false;
 
