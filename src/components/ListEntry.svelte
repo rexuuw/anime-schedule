@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { anime } from "../model/anime";
+  import watchListStore from "../stores/watchList";
 
   export let anime;
   export let index;
@@ -16,25 +17,28 @@
 
   // let link : string = anime.title.userPreffered.toLowerCase().replace(/\s+/g, "-");
 
-  function deleteItem () {
-    list = [...list.filter(i => i != list[index])];
-    localStorage.setItem(day + "Ani", JSON.stringify(list));
-  }
-
   function addToWatchlist() {
     let watchList : string[] = JSON.parse(localStorage.getItem("watchList")) || [];
     if (watchList.indexOf(anime.title.userPreferred) === -1) {
       watchList.push(anime.title.userPreferred);
+      watchListStore.update(watchList => {
+        return [...watchList, anime.title.userPreferred]
+      })
     }
     localStorage.setItem("watchList", JSON.stringify(watchList));
-    location.reload();
   }
 
   function deleteFromWatchList() {    
     let watchList : string[] = JSON.parse(localStorage.getItem("watchList")) || [];
     watchList.splice(watchList.indexOf(anime.title.userPreferred));
+    watchList.slice
     localStorage.setItem("watchList", JSON.stringify(watchList));
-    location.reload();
+
+    watchListStore.update(watchList => {
+      //watchList.splice(watchList.indexOf(anime.title.userPreferred));
+      
+      return watchList.filter(title => title !== anime.title.userPreferred);
+    })
   }
 </script>
 

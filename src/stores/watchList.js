@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 
-let lsWatchList = JSON.parse(localStorage.getItem("watchList"));
+let watchList = JSON.parse(localStorage.getItem("watchList"));
 
-const watchList = writable(lsWatchList);
+const watchListStore = writable(watchList);
 
-export default watchList;
+export default watchListStore;

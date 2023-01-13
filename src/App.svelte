@@ -2,9 +2,14 @@
 	import ListEntry from "./components/ListEntry.svelte";
   import type { anime } from "./model/anime";
   import { onMount, onDestroy } from "svelte";
+  import watchListStore from "./stores/watchList";
   
-  let watchList: string[] = JSON.parse(localStorage.getItem("watchList")) || [];
+  let watchList: string[]; //= JSON.parse(localStorage.getItem("watchList")) || [];
   
+  watchListStore.subscribe(data => {
+    watchList = data;    
+  })
+
   let monAni: anime[] = [];
   let tueAni: anime[] = [];
   let wedAni: anime[] = [];
@@ -46,7 +51,7 @@
     }
 
     console.log("Season:", variables.season, variables.seasonYear, "\n", list);
-    console.log(watchList);
+    console.log("WatchList \n", watchList);
   }
 
   function handleError(error) {
