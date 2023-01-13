@@ -1,10 +1,12 @@
 <script lang="ts">
-    import type { anime } from "../model/anime";
+  import type { anime } from "../model/anime";
 
   export let anime;
   export let index;
   export let list;
   export let day;
+  export let watching;
+  let expanded : boolean = false;
 
   let today = new Date();
   let releaseDate = new Date((anime.nextAiringEpisode.airingAt + 3600) * 1000 );
@@ -18,11 +20,27 @@
     list = [...list.filter(i => i != list[index])];
     localStorage.setItem(day + "Ani", JSON.stringify(list));
   }
+
+  function addToWatchlist() {
+    let watchList : string[] = JSON.parse(localStorage.getItem("watchList")) || [];
+    if (watchList.indexOf(anime.title.userPreferred) === -1) {
+      watchList.push(anime.title.userPreferred);
+    }
+    localStorage.setItem("watchList", JSON.stringify(watchList));
+    location.reload();
+  }
+
+  function deleteFromWatchList() {    
+    let watchList : string[] = JSON.parse(localStorage.getItem("watchList")) || [];
+    watchList.splice(watchList.indexOf(anime.title.userPreferred));
+    localStorage.setItem("watchList", JSON.stringify(watchList));
+    location.reload();
+  }
 </script>
 
-<main >
+<main class={ expanded ? "expanded" : "" }>
   <div class="background" style="background-image: url({anime.bannerImage}); background-image: linear-gradient(-90deg, rgba(46, 46, 46, 0.5), rgba(10, 10, 10, 0.9) 70%), url({anime.bannerImage});">
-    <button class="dragButton">
+    <button class="dragButton" on:click={ () => { expanded = !expanded } }>
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
       </svg>      
@@ -31,6 +49,20 @@
     <div class="title">
         <h1>{anime.title.userPreferred}</h1>
     </div>
+    <button class="dragButton" on:click={() => {
+      if(!watching) {
+        addToWatchlist()
+      } else {
+        deleteFromWatchList()
+      }}}>
+      <span>
+        {#if (!watching)}
+          <span>+</span>
+        {:else}
+          -
+        {/if}
+      </span>
+    </button>
     <!-- <button class="delete" on:click={deleteItem}>
       <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#ffffff">
         <path d="M0 0h24v24H0z" fill="none"/>
@@ -83,7 +115,7 @@
     transition: max-height 0.3s;
   }
 
-  main:focus-within {
+  .expanded {
     max-height: 1000px;
   }
 
@@ -91,7 +123,7 @@
     transition: transform 0.15s;
   }
 
-  main:focus-within .dragButton svg {
+  .expanded .dragButton svg {
     transform: rotate(90deg);
   }
 
@@ -112,8 +144,13 @@
   .dragButton {
     width: 50px;
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     background-color: transparent;
+    color: #fff;
+    font-size: 1.5em;
     outline: none;
     border: none;
     cursor: pointer;
@@ -121,7 +158,8 @@
   }
 
   .dragButton:hover {
-    background-color: rgb(61, 61, 61);
+    /* background-color: rgba(206, 1, 103, 0.45); */
+    background-color: rgba(255, 255, 255, 0.6);
   }
 
   img {

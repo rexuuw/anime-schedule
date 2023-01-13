@@ -20,6 +20,6 @@ export class anime {
   nextAiringEpisode: nextAiringEpisode;
 
   constructor(title: string) {
-    this.title.userPreffered = title;
+    this.title.userPreferred = title;
   } 
 }
