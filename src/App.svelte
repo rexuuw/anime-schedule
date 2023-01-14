@@ -2,7 +2,14 @@
 	import ListEntry from "./components/ListEntry.svelte";
   import type { anime } from "./model/anime";
   import { onMount, onDestroy } from "svelte";
+  import watchListStore from "./stores/watchList";
   
+  let watchList: string[];
+  
+  watchListStore.subscribe(data => {
+    watchList = data;    
+  })
+
   let monAni: anime[] = [];
   let tueAni: anime[] = [];
   let wedAni: anime[] = [];
@@ -17,9 +24,13 @@
 
   $: list;
 
-
+  /**
+   * Filters the given array by the given day of the week and sorts the resulting array by airing date
+   * @param fetchedAnime - The array of shows
+   * @param day - The day of the week for which should be filtered
+   */
   function sortAnime(fetchedAnime, day) {
-    return fetchedAnime.filter(item => {
+    fetchedAnime = fetchedAnime.filter(item => {
       try {
         let airDate = new Date(item.nextAiringEpisode.airingAt * 1000);
         return airDate.getDay() === day;
@@ -27,6 +38,9 @@
         console.error("An error occurred while sorting the following item: \n", item, "\n", error);
         return false;
       }
+    })
+    return fetchedAnime.sort(function(a, b) {
+      return new Date(a.nextAiringEpisode.airingAt).getTime() - new Date(b.nextAiringEpisode.airingAt).getTime()
     })
   }
 
@@ -44,6 +58,7 @@
     }
 
     console.log("Season:", variables.season, variables.seasonYear, "\n", list);
+    console.log("WatchList \n", watchList);
   }
 
   function handleError(error) {
@@ -178,7 +193,6 @@
       .then(handleData)
       .catch(handleError);
   });
-
   
 </script>
 
@@ -188,56 +202,142 @@
     <div class="dayWrapper">
       <h1 class="{today === 1 ? 'today' : ''}">Monday</h1>
       <ul class="listWrapper">
-        {#each list[1] as anime, i}
-          <ListEntry anime={anime} index={i} bind:list={monAni} day="mon"/>
+        {#if list[1].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <p class="listSeperator">
+            <span class="watching">Watching</span>
+            <span class="count">({ list[1].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length })</span>
+          </p>
+        {/if}
+        {#each list[1].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1) as anime, i}
+          <ListEntry anime={anime} watching={true}/>
+        {/each}
+        {#if list[1].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <span class="listSeperator">Not watching</span>
+        {/if}
+        {#each list[1].filter((anime) => watchList.indexOf(anime.title.userPreferred) === -1) as anime, i}
+          <ListEntry anime={anime} watching={false}/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
       <h1 class="{today === 2 ? 'today' : ''}">Tuesday</h1>
       <ul class="listWrapper">
-        {#each list[2] as anime, i}
-          <ListEntry anime={anime} index={i} bind:list={tueAni} day="tue"/>
+        {#if list[2].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1). length > 0}
+          <p class="listSeperator">
+            <span class="watching">Watching</span>
+            <span class="count">({ list[2].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length })</span>
+          </p>
+        {/if}
+        {#each list[2].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1) as anime, i}
+          <ListEntry anime={anime} watching={true}/>
+        {/each}
+        {#if list[2].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1). length > 0}
+          <span class="listSeperator">Not watching</span>
+        {/if}
+        {#each list[2].filter((anime) => watchList.indexOf(anime.title.userPreferred) === -1) as anime, i}
+          <ListEntry anime={anime} watching={false}/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
       <h1 class="{today === 3 ? 'today' : ''}">Wednesday</h1>
       <ul class="listWrapper">
-        {#each list[3] as anime, i}
-          <ListEntry anime={anime} index={i} bind:list={wedAni} day="wed"/>
+        {#if list[3].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <p class="listSeperator">
+            <span class="watching">Watching</span>
+            <span class="count">({ list[3].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length })</span>
+          </p>
+        {/if}
+        {#each list[3].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1) as anime, i}
+          <ListEntry anime={anime} watching={true}/>
+        {/each}
+        {#if list[3].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <span class="listSeperator">Not watching</span>
+        {/if}
+        {#each list[3].filter((anime) => watchList.indexOf(anime.title.userPreferred) === -1) as anime, i}
+          <ListEntry anime={anime} watching={false}/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
       <h1 class="{today === 4 ? 'today' : ''}">Thursday</h1>
       <ul class="listWrapper">
-        {#each list[4] as anime, i}
-          <ListEntry anime={anime} index={i} bind:list={thuAni} day="thu"/>
+        {#if list[4].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <p class="listSeperator">
+            <span class="watching">Watching</span>
+            <span class="count">({ list[4].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length })</span>
+          </p>
+        {/if}
+        {#each list[4].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1) as anime, i}
+          <ListEntry anime={anime} watching={true}/>
+        {/each}
+        {#if list[4].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <span class="listSeperator">Not watching</span>
+        {/if}
+        {#each list[4].filter((anime) => watchList.indexOf(anime.title.userPreferred) === -1) as anime, i}
+          <ListEntry anime={anime} watching={false}/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
       <h1 class="{today === 5 ? 'today' : ''}">Friday</h1>
       <ul class="listWrapper">
-        {#each list[5] as anime, i}
-          <ListEntry anime={anime} index={i} bind:list={friAni} day="fri"/>
+        {#if list[5].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <p class="listSeperator">
+            <span class="watching">Watching</span>
+            <span class="count">({ list[5].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length })</span>
+          </p>
+        {/if}
+        {#each list[5].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1) as anime, i}
+          <ListEntry anime={anime} watching={true}/>
+        {/each}
+        {#if list[5].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <span class="listSeperator">Not watching</span>
+        {/if}
+        {#each list[5].filter((anime) => watchList.indexOf(anime.title.userPreferred) === -1) as anime, i}
+          <ListEntry anime={anime} watching={false}/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
       <h1 class="{today === 6 ? 'today' : ''}">Saturday</h1>
       <ul class="listWrapper">
-        {#each list[6] as anime, i}
-          <ListEntry anime={anime} index={i} bind:list={satAni} day="sat"/>
+        {#if list[6].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <p class="listSeperator">
+            <span class="watching">Watching</span>
+            <span class="count">({ list[6].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length })</span>
+          </p>
+        {/if}
+        {#each list[6].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1) as anime, i}
+          <ListEntry anime={anime} watching={true}/>
+        {/each}
+        {#if list[6].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <span class="listSeperator">Not watching</span>
+        {/if}
+        {#each list[6].filter((anime) => watchList.indexOf(anime.title.userPreferred) === -1) as anime, i}
+          <ListEntry anime={anime} watching={false}/>
         {/each}
       </ul>
     </div>
     <div class="dayWrapper">
       <h1 class="{today === 0 ? 'today' : ''}">Sunday</h1>
       <ul class="listWrapper">
-        {#each list[0] as anime, i}
-          <ListEntry anime={anime} index={i} bind:list={sunAni} day="sun"/>
+        {#if list[0].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <p class="listSeperator">
+            <span class="watching">Watching</span>
+            <span class="count">({ list[0].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length })</span>
+          </p>
+        {/if}
+        {#each list[0].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1) as anime, i}
+          <ListEntry anime={anime} watching={true}/>
+        {/each}
+        {#if list[0].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0}
+          <span class="listSeperator">
+            Not watching
+          </span>
+        {/if}
+        {#each list[0].filter((anime) => watchList.indexOf(anime.title.userPreferred) === -1) as anime, i}
+          <ListEntry anime={anime} watching={false}/>
         {/each}
       </ul>
     </div>
@@ -271,6 +371,23 @@
 
   .today {
     color: rgb(206, 1, 103);
+  }
+
+  .listSeperator {
+    width: 100%;
+    padding: 0.5em;
+    margin-bottom: 7px;
+    display: block;
+    border-radius: 10px;
+    background-color: rgba(206, 1, 104, 0.15);
+  }
+
+  .listSeperator .watching {
+    font-weight: bold;
+  }
+
+  .listSeperator .count {
+    opacity: 0.5;
   }
 
 </style>

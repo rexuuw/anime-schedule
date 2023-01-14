@@ -5,7 +5,7 @@ export interface coverImage {
 }
 
 export interface title {
-  userPreffered;
+  userPreferred;
 }
 
 export interface startDate {
