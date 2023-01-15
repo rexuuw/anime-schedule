@@ -25,12 +25,9 @@
   function deleteFromWatchList() {    
     let watchList : string[] = JSON.parse(localStorage.getItem("watchList")) || [];
     watchList.splice(watchList.indexOf(anime.title.userPreferred));
-    watchList.slice
     localStorage.setItem("watchList", JSON.stringify(watchList));
 
     watchListStore.update(watchList => {
-      //watchList.splice(watchList.indexOf(anime.title.userPreferred));
-      
       return watchList.filter(title => title !== anime.title.userPreferred);
     })
   }
@@ -46,6 +43,11 @@
     <img src={anime.coverImage.large} alt="#"/>
     <div class="title">
         <h1>{anime.title.userPreferred}</h1>
+        <p>
+          <span>{anime.nextAiringEpisode.episode - 1}/{anime.episodes || "?"} Ep.</span> 
+          • 
+          <span>{releaseDate.toLocaleString('de-DE', {hour: '2-digit', minute: "2-digit"})}</span>
+        </p>
     </div>
     <button class="dragButton" on:click={() => {
       if(!watching) {
@@ -159,20 +161,29 @@
   }
 
   .title {
-    margin-left: 15px;
+    margin-inline: 15px 5px;
     width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
   }
 
   .title h1 {
-    margin: 0 0 10px 0;
+    margin: 0 0 5px 0;
     text-overflow: ellipsis;
     font-weight: 600;
     color: #fff;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .title p {
+    margin: 0;
+  }
+
+  .title p span {
+    opacity: 0.6;
   }
 
   .progress {
