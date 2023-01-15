@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { anime } from "../model/anime";
   import watchListStore from "../stores/watchList";
 
   export let anime;
@@ -11,8 +10,6 @@
   let dayDiff = Math.ceil(Math.abs(releaseDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) - 1;
 
   let progress = (anime.nextAiringEpisode.episode - 1) / anime.episodes * 100;
-
-  // let link : string = anime.title.userPreffered.toLowerCase().replace(/\s+/g, "-");
 
   function addToWatchlist() {
     let watchList : string[] = JSON.parse(localStorage.getItem("watchList")) || [];
@@ -64,12 +61,6 @@
         {/if}
       </span>
     </button>
-    <!-- <button class="delete" on:click={deleteItem}>
-      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#ffffff">
-        <path d="M0 0h24v24H0z" fill="none"/>
-        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-      </svg>
-    </button> -->
   </div>
   <div class="progress">
     <div class="progressbar" style="width: {progress}%;"> </div>
@@ -135,7 +126,6 @@
     align-items: center;
     border-radius: 5px;
 
-    
     /* background: linear-gradient(-90deg, rgba(46, 46, 46, 0.5), rgba(14, 14, 14, 0.9)); */
     background-repeat: no-repeat;
     background-position: center;
@@ -184,46 +174,6 @@
     font-weight: 600;
     color: #fff;
   }
-
-  /* .delete {
-    height: 50px;
-    width: 60px;
-    position: relative;
-    left: 100px;
-    margin-right: 15px;
-    padding: 0;
-
-    outline: none;
-    border: none;
-    border-radius: 5px;
-    background-color: rgb(131, 15, 0);
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
-
-    visibility: hidden;
-    opacity: 0;
-    transform: scale(0.1);
-    transition: all 0.3s;
-  }
-
-  .delete svg {
-    transition: all 0.3s;
-  }
-
-  .delete:hover {
-    background-color: rgb(78, 9, 0);
-    cursor: pointer;
-  }
-
-  .delete:hover svg {
-    fill: rgb(139, 139, 139);
-  }
-
-  main:hover .delete {
-    left: 0;
-    transform: scale(1);
-    visibility: visible;
-    opacity: 1;
-  } */
 
   .progress {
     width: 100%;

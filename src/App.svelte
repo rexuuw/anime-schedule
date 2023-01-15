@@ -29,6 +29,10 @@
   function sortAnime(fetchedAnime, day) {
     fetchedAnime = fetchedAnime.filter(item => {
       try {
+        if (item.nextAiringEpisode == null) {
+          return false;
+        }
+
         let airDate = new Date(item.nextAiringEpisode.airingAt * 1000);
 
         // with the previous solution the week starts on sunday
@@ -58,7 +62,7 @@
     let fetchedAnime = data.data.Page.media;
 
     for (let i = 0; i < list.length; i++) {
-      list[i] = sortAnime(fetchedAnime, i);
+      list[i] = [...list[i],...sortAnime(fetchedAnime, i)];
     }
 
     console.log("Season:", variables.season, variables.seasonYear, "\n", list);
@@ -172,7 +176,15 @@
     page: 1,
     season: "WINTER",
     seasonYear: 2023,
-    format: "TV",
+    // format: "TV",
+    type: "ANIME"
+  };
+
+  var variablesPrevious = {
+    page: 1,
+    season: "FALL",
+    seasonYear: 2022,
+    // format: "TV",
     type: "ANIME"
   };
 
@@ -188,12 +200,30 @@
         query: query,
         variables: variables
       })
-    };
+    },
+    optionsPrevious = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        query: query,
+        variables: variablesPrevious
+      })
+    };;
 
 
   onMount(() => {
     // Make the HTTP Api request
-    fetch(url, options).then(handleResponse)
+    fetch(url, options)
+      .then(handleResponse)
+      .then(handleData)
+      .catch(handleError);
+
+    // Make Api request for the previous sesaon to get continuing shows
+    fetch(url, optionsPrevious)
+      .then(handleResponse)
       .then(handleData)
       .catch(handleError);
   });

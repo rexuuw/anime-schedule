@@ -7,7 +7,6 @@
 
   let date = new Date();
   let today = date.toLocaleString('en-us', { weekday: 'long' });
-  console.log(today);
   
   let days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
