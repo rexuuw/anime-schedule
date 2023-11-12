@@ -1,0 +1,53 @@
+<main [class]="expanded ? 'expanded' : ''">
+  <!-- <div class="background" style="background-image: url(anime.bannerImage); background-image: linear-gradient(-90deg, rgba(46, 46, 46, 0.5), rgba(10, 10, 10, 0.9) 70%), url(anime.bannerImage);"> -->
+  <div class="background" [style]="banner">
+    <button class="expandButton" (click)="expand()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+      </svg>      
+    </button>
+    <img [src]="anime?.coverImage?.large" alt="#"/>
+    <div class="title">
+        <a [href]="'https://anilist.co/anime/' + anime?.id" target="_blank" [title]="anime?.title?.romaji">{{anime?.title?.romaji}}</a>
+        <div class="titleDetails">
+          <div *ngIf="anime?.averageScore">
+            <span>{{ (anime?.averageScore || 0) / 10 | number:"1.2" }}</span>
+            •
+          </div>
+          <span>{{(anime?.nextAiringEpisode?.episode || 0) - 1}}/{{anime?.episodes || "?"}} Ep.</span> 
+          • 
+          <span>{{ releaseDate | date:"HH:mm" }}</span>
+        </div>
+    </div>
+
+  </div>
+  <div class="progress">
+    <div class="progressbar" [ngStyle]="{'width': (!expanded) ? '0%' : (((anime?.nextAiringEpisode?.episode || 0) - 1) / (anime?.episodes || 12) * 100) + '%'}"> </div>
+  </div>
+  <div class="information">
+    <span class="score">
+      <p>{{ anime?.averageScore || "?" }} / 100</p>
+      <p>Score</p>
+    </span>
+    <span class="episodes">
+      <p>{{ (anime?.nextAiringEpisode?.episode || 0) - 1 }} / {{ anime?.episodes || "?" }}</p>
+      <p>Episodes</p>
+    </span>
+    <span class="genres">
+      <p class="genre" *ngFor="let genre of anime?.genres">{{ genre }}</p>
+    </span>
+    <span class="descr">
+      <p *ngIf="anime?.nextAiringEpisode?.episode === 1; else second">
+        Releasing: {{ releaseDate | date:"MMM dd, yyyy 'at' hh:mm a" }} -> in {{ dayDiff }} Days
+        <!-- .toLocaleString('de-DE',  timeZone: 'CET', hour: '2-digit', minute: "2-digit")  -->
+      </p>
+      <ng-template #second>
+        <p>
+          Airing: {{ releaseDate | date:"MMM dd yyyy 'at' hh:mm a"}}
+          <!-- .toLocaleString('de-DE', hour: '2-digit', minute: "2-digit") -->
+        </p>
+      </ng-template>
+       <span [innerHTML]="anime?.description || ''"></span>
+    </span>
+  </div>
+</main>
