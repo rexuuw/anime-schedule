@@ -1,0 +1,20 @@
+<div class="dayWrapper" *ngFor="let day of week; index as i">
+  <h2 [ngClass]="today === days[i] ? 'today' : ''">
+    {{ days[i] }}
+  </h2>
+  <ul class="listWrapper">
+    <div class="onWatchlistWrapper" *ngIf="weekOnWatchlist[i].length > 0">
+      <p class="listSeperator">
+        <span class="watching">Watching</span>
+        <span class="count">
+          ({{ weekOnWatchlist[i].length }})
+        </span>
+      </p>
+      <as-schedule-entry *ngFor="let anime of weekOnWatchlist[i]" [anime]="anime"></as-schedule-entry>
+    </div>
+
+    <span class="listSeperator" *ngIf="weekOnWatchlist[i].length > 0">Not watching</span>
+    <as-schedule-entry *ngFor="let anime of weekNotOnWatchlist[i]" [anime]="anime"></as-schedule-entry>
+  </ul>
+</div>
+
