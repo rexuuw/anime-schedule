@@ -10,16 +10,19 @@
     <div class="title">
         <a [href]="'https://anilist.co/anime/' + anime?.id" target="_blank" [title]="anime?.title?.romaji">{{anime?.title?.romaji}}</a>
         <div class="titleDetails">
+          <span>{{ releaseDate | date:"HH:mm" }}</span>
+          • 
           <div *ngIf="anime?.averageScore">
             <span>{{ (anime?.averageScore || 0) / 10 | number:"1.2" }}</span>
             •
           </div>
           <span>{{(anime?.nextAiringEpisode?.episode || 0) - 1}}/{{anime?.episodes || "?"}} Ep.</span> 
-          • 
-          <span>{{ releaseDate | date:"HH:mm" }}</span>
         </div>
     </div>
-
+    <button class="expandButton" (click)="toggleWatchlist()">
+      <span *ngIf="onWatchlist; else notOnWatchlist">-</span>
+      <ng-template #notOnWatchlist>+</ng-template>
+    </button>
   </div>
   <div class="progress">
     <div class="progressbar" [ngStyle]="{'width': (!expanded) ? '0%' : (((anime?.nextAiringEpisode?.episode || 0) - 1) / (anime?.episodes || 12) * 100) + '%'}"> </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { anime } from 'src/app/models/anime.model';
 import { AnilistService } from 'src/app/services/anilist.service';
+import { WatchlistService } from 'src/app/services/watchlist.service';
 
 @Component({
   templateUrl: './schedule-page.component.html',
@@ -9,16 +10,26 @@ import { AnilistService } from 'src/app/services/anilist.service';
 export class SchedulePageComponent implements OnInit {
 
   week: anime[][] = [[], [], [], [], [], [], []];
+  weekNotOnWatchlist: anime[][] = [[], [], [], [], [], [], []];
+  weekOnWatchlist: anime[][] = [[], [], [], [], [], [], []];
   days: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   today: string = new Date().toLocaleString('en-us', { weekday: 'long' });
+  watchlist: string[] = [];
 
-  constructor(private anilist: AnilistService) { }
+  constructor(private anilist: AnilistService, private watchlistService: WatchlistService) { }
 
   async ngOnInit(): Promise<void> {
     let res: anime[] = await this.anilist.getAnime(); 
     console.log("schedule res", res);
     this.groupAnime(res);
     console.log(this.week);
+    
+    // TODO: muss mit BehaviorSubject umgesetzt werden, um richtig anzuzeigen
+    this.watchlistService._watchList.subscribe(watchList => {
+      this.watchlist = watchList;
+      console.log("wl", this.watchlist);
+      this.groupByWatchlist(watchList);
+    });
   }
 
   sortAnime(fetchedAnime: anime[], day: number) {
@@ -56,6 +67,20 @@ export class SchedulePageComponent implements OnInit {
       let day = airDate.getDay() !== 0 ? airDate.getDay() - 1 : 6;
       
       this.week[day].push(item);
+    }
+
+    // Sort by Airing time
+    for (let i = 0; i < this.week.length; i++) {
+      this.week[i].sort((a, b) => new Date(a.nextAiringEpisode.airingAt).getTime() - new Date(b.nextAiringEpisode.airingAt).getTime());
+    }
+
+    this.groupByWatchlist(this.watchlist);
+  }
+
+  groupByWatchlist(watchlist: string[]) {
+    for (let i = 0; i < this.week.length; i++) {
+      this.weekOnWatchlist[i] = this.week[i].filter(anime => watchlist.indexOf(anime.title.romaji) > -1);
+      this.weekNotOnWatchlist[i] = this.week[i].filter(anime => watchlist.indexOf(anime.title.romaji) === -1);
     }
   }
 

@@ -3,16 +3,18 @@
     {{ days[i] }}
   </h2>
   <ul class="listWrapper">
-    <!-- {#if list[listIndex].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length > 0} -->
+    <div class="onWatchlistWrapper" *ngIf="weekOnWatchlist[i].length > 0">
       <p class="listSeperator">
         <span class="watching">Watching</span>
         <span class="count">
-          <!-- ({ list[listIndex].filter((anime) => watchList.indexOf(anime.title.userPreferred) > -1).length }) -->
+          ({{ weekOnWatchlist[i].length }})
         </span>
       </p>
+      <as-schedule-entry *ngFor="let anime of weekOnWatchlist[i]" [anime]="anime"></as-schedule-entry>
+    </div>
 
-      <span class="listSeperator">Not watching</span>
-      <as-schedule-entry *ngFor="let anime of day" [anime]="anime"></as-schedule-entry>
+    <span class="listSeperator" *ngIf="weekOnWatchlist[i].length > 0">Not watching</span>
+    <as-schedule-entry *ngFor="let anime of weekNotOnWatchlist[i]" [anime]="anime"></as-schedule-entry>
   </ul>
 </div>
 
