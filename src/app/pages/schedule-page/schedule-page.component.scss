@@ -25,6 +25,7 @@
 
 .today {
   color: rgb(206, 1, 103);
+  background-color: rgb(47, 47, 47);
 }
 
 .onWatchlistWrapper {
@@ -32,18 +33,45 @@
 }
 
 .listSeperator {
+  height: 2.3em;
   width: 100%;
-  padding: 0.5em;
+  padding: 0.3em 0.5em;
   margin-bottom: 7px;
-  display: block;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(206, 1, 104, 0.5);
   border-radius: 10px;
   background-color: rgba(206, 1, 104, 0.15);
-}
+  
+  .watching {
+    font-weight: bold;
+  }
+  
+  .count {
+    opacity: 0.5;
+  }
 
-.listSeperator .watching {
-  font-weight: bold;
-}
+  button {
+    height: 2em;
+    width: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(206, 1, 104, 0.5);
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: background-color 0.3s;
 
-.listSeperator .count {
-  opacity: 0.5;
+    &:hover {
+      background-color: rgba(206, 1, 104, 0.7);
+    }
+  }
+
+  svg {
+    height: 1.5em;
+  }
 }
