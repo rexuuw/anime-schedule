@@ -1,6 +1,6 @@
 import type { coverImage, title, startDate, endDate, nextAiringEpisode } from "./models.model";
 
-export interface anime {
+export interface Anime {
   id: number;
   title: title;
   coverImage: coverImage;

@@ -5,13 +5,15 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SchedulePageComponent } from './pages/schedule-page/schedule-page.component';
 import { ScheduleEntryComponent } from './components/schedule-entry/schedule-entry.component';
+import { NavBarComponent } from './components/nav-bar/nav-bar.component';
 import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
     AppComponent,
     SchedulePageComponent,
-    ScheduleEntryComponent
+    ScheduleEntryComponent,
+    NavBarComponent,
   ],
   imports: [
     BrowserModule,
