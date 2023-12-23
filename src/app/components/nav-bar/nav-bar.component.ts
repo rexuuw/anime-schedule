@@ -19,9 +19,21 @@ export class NavBarComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.fragment.subscribe(fragment => {
-      this.anilistService.getAuthenticatedUser().then(res => {
-        this.user = res;
-      });
+      if (fragment?.includes("access_token=")) {
+        // Set authenticated user
+        this.anilistService.getAuthenticatedUser().then(res => {
+          this.user = res;
+        });
+        
+      } else {
+        let accessToken = localStorage.getItem("access_token");
+        if (accessToken) {
+          // Set authenticated user
+          this.anilistService.getAuthenticatedUser().then(res => {
+            this.user = res;
+          });
+        }
+      }
     })
   }
 

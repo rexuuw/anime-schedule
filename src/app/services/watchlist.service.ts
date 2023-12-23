@@ -15,7 +15,7 @@ export class WatchlistService {
   constructor(private anilist: AnilistService) { }
 
   public async getWatchlist(animeIds: number[]) {
-    let res: ListEntry[] = await this.anilist.getListProgress(animeIds);
+    let res: ListEntry[] = await this.anilist.getListProgress(animeIds) || [];
     this.setWatchlist(res);
   }
 

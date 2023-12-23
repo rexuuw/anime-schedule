@@ -32,6 +32,18 @@ export class AnilistService {
         this.getAuthenticatedUser().then(res => {
           this.user = res;
         });
+        
+        localStorage.setItem("access_token", this.accessToken);
+      } else {
+        let accessToken = localStorage.getItem("access_token");
+        if (accessToken) {
+          this.accessToken = accessToken;
+
+          // Set authenticated user
+          this.getAuthenticatedUser().then(res => {
+            this.user = res;
+          });
+        }
       }
     })    
   }
@@ -176,6 +188,10 @@ export class AnilistService {
   }
 
   async getListProgress(animeIds: number[]) {
+    if (!this.user || this.user?.name === '') {
+      return;
+    }
+
     this.page = 1;
     let anime: ListEntry[] = [];
     let res;
