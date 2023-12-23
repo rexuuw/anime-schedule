@@ -38,9 +38,9 @@ export class ScheduleEntryComponent implements OnInit {
       this.watchlinkService.getAnimeInfo(this.anime?.title.romaji).subscribe((res: any) => {
         if (res.data) {
           this.watchlinkService.getWatchlink(res.data[0].id).subscribe((res: any) => {
-            let url: string = res?.data[0]?.attributes?.url
+            let url: string = res?.data[0]?.attributes?.url;
   
-            if (url.includes("crunchyroll")) {
+            if (url && url.includes("crunchyroll")) {
               this.watchLink = url;
             }
           })
@@ -55,7 +55,7 @@ export class ScheduleEntryComponent implements OnInit {
   }
 
   public toggleWatchlist() {
-    this.watchlistService.toggleWatchlist(this.anime);
+    this.watchlistService.toggleWatchlist(this.anime, this.onWatchlist);
   }
 
 }

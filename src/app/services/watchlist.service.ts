@@ -1,53 +1,58 @@
 import { Injectable } from '@angular/core';
-import { anime } from '../models/anime.model';
+import { Anime } from '../models/anime.model';
 import { BehaviorSubject } from 'rxjs';
+import { AnilistService } from './anilist.service';
+import { ListEntry } from '../models/listEntry.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WatchlistService {
 
-  public _watchList = new BehaviorSubject<string[]>(JSON.parse(localStorage.getItem("watchList") || ""));
+  public _watchList = new BehaviorSubject<ListEntry[]>([]);
   private _watchList$ = this._watchList.getValue();
 
-  constructor() { }
+  constructor(private anilist: AnilistService) { }
 
-  private getWatchlist() {
-    if (!localStorage.getItem("watchList")) {
-      localStorage.setItem("watchList", JSON.stringify([]));
-    }
-
-    this.setWatchlist(JSON.parse(localStorage.getItem("watchList") || ""));
+  public async getWatchlist(animeIds: number[]) {
+    let res: ListEntry[] = await this.anilist.getListProgress(animeIds);
+    this.setWatchlist(res);
   }
 
-  public setWatchlist(watchlist: string[]) {
+  public setWatchlist(watchlist: ListEntry[]) {
     return this._watchList.next(watchlist);
   }
 
-  public toggleWatchlist(anime: any) {
-    this.getWatchlist();
-
-    if (this._watchList$.indexOf(anime.title.romaji) === -1) {
+  public toggleWatchlist(anime: any, onWatchlist: boolean) {
+    if (!onWatchlist) {
       this.addToWatchlist(anime);
     } else {
       this.removeFromWatchlist(anime)
     }
   }
 
-  private addToWatchlist(anime: anime) {
-    let watchList: string[] = this._watchList$;
+  private async addToWatchlist(anime: Anime) {
+    let watchList: ListEntry[] = this._watchList.getValue();
+  
+    let res: ListEntry = await this.anilist.addAnimeToList(anime.id);
 
-    watchList.push(anime.title.romaji);
-    this.setWatchlist(watchList);
-
-    localStorage.setItem("watchList", JSON.stringify(watchList));
+    if (res) {
+      watchList.push(res);
+      this.setWatchlist(watchList);
+    }
   }
 
-  private removeFromWatchlist(anime: anime) {
-    let watchList: string[] = this._watchList$;
+  private async removeFromWatchlist(anime: Anime) {
+    let watchList: ListEntry[] = this._watchList.getValue();
+    let entryId = watchList.find(entry => entry.media.id === anime.id)?.id;
     
-    watchList.splice(watchList.indexOf(anime.title.romaji), 1);
-    this.setWatchlist(watchList);
-    localStorage.setItem("watchList", JSON.stringify(watchList));
+    if (entryId) {
+      let res: boolean = await this.anilist.deleteAnimeFromList(entryId);
+
+      if (res) {
+        watchList.splice(watchList.findIndex(entry => entry.media.id === anime.id), 1);
+        this.setWatchlist(watchList);
+      }
+    }
   }
 }

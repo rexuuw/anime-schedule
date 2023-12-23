@@ -18,7 +18,7 @@
       <as-schedule-entry *ngFor="let anime of weekOnWatchlist[i]" [anime]="anime" class="onList{{i}}"></as-schedule-entry>
     </div>
 
-    <span class="listSeperator" *ngIf="weekOnWatchlist[i].length > 0">Not watching</span>
+    <span class="listSeperator" *ngIf="weekOnWatchlist[i].length > 0 && weekNotOnWatchlist[i].length > 0">Not watching</span>
     <as-schedule-entry *ngFor="let anime of weekNotOnWatchlist[i]" [anime]="anime"></as-schedule-entry>
   </ul>
 </div>

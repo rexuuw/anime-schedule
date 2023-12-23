@@ -1,14 +1,53 @@
 import { Injectable } from '@angular/core';
-import { anime } from '../models/anime.model';
+import { Anime } from '../models/anime.model';
 import { Seasons } from "../models/seasons.enum";
+import { ListEntry } from '../models/listEntry.model';
+import { ActivatedRoute } from '@angular/router';
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AnilistService {
 
-  private readonly url = 'https://graphql.anilist.co'
-  private readonly query = `
+  private readonly url = 'https://graphql.anilist.co';  
+  
+  private accessToken?: string;
+  private page: number = 1
+  private season: string = "";
+  private previousSeason: string = "";
+  private year: number = 0;
+  private previousYear: number = 0;
+  private user?: User;
+  
+  constructor(private route: ActivatedRoute) {
+    route.fragment.subscribe(fragment => {
+      if (fragment?.includes("access_token=")) {
+        // Set Bearer
+        let start = fragment.indexOf("=") + 1;
+        let end = fragment.indexOf("&");
+        this.accessToken = fragment.slice(start, end);
+
+        // Set authenticated user
+        this.getAuthenticatedUser().then(res => {
+          this.user = res;
+        });
+      }
+    })    
+  }
+
+  private handleResponse(response: any) {
+    return response.json().then(function (json: any) {
+        return response.ok ? json : Promise.reject(json);
+    });
+  }
+
+  async getAnime() {
+    this.page = 1;
+    let anime: Anime[] = [];
+    let res;
+
+    const query = `
   query(
     $page:Int = 10 
     $id:Int 
@@ -22,7 +61,7 @@ export class AnilistService {
     $season:MediaSeason 
     $seasonYear:Int 
     $year:String 
-    $onList:Boolean 
+    $onList:Boolean
     $yearLesser:FuzzyDateInt 
     $yearGreater:FuzzyDateInt 
     $episodeLesser:Int 
@@ -44,7 +83,7 @@ export class AnilistService {
     {
       Page(
         page:$page,
-        perPage:100
+        perPage:150
         )
         {
           pageInfo
@@ -104,26 +143,6 @@ export class AnilistService {
         }
       }
       `;
-  
-  private page: number = 1
-  private season: string = "";
-  private previousSeason: string = "";
-  private year: number = 0;
-  private previousYear: number = 0;
-  
-  constructor() { }
-
-  private handleResponse(response: any) {
-    return response.json().then(function (json: any) {
-        return response.ok ? json : Promise.reject(json);
-    });
-  }
-
-  async getAnime() {
-    this.getSeasons();
-
-    let anime: anime[] = [];
-    let res;
     
     // Fetch atleast once and as long as there is a next page
     do {
@@ -134,11 +153,12 @@ export class AnilistService {
           'Accept': 'application/json',
         },
         body: JSON.stringify({
-          query: this.query,
+          query: query,
           variables: {
             page: this.page,
-            season: this.season,
-            seasonYear: this.year,
+            status: 'RELEASING',
+            // season: this.season,
+            // seasonYear: this.year,
             format: ['TV', 'MOVIE', 'TV_SHORT']
           }
         })
@@ -150,24 +170,66 @@ export class AnilistService {
       anime = [...anime, ...res.data.Page.media]
 
       this.page++;
-    } while (res.data.Page.pageInfo.hasNextPage && this.page < 25);
+    } while (res.data.Page.pageInfo.hasNextPage && this.page < 50);
 
+    return anime;
+  }
+
+  async getListProgress(animeIds: number[]) {
     this.page = 1;
+    let anime: ListEntry[] = [];
+    let res;
 
-    // Fetch for previous season
+    const medialistQuery = `
+  query($page:Int,$userId:Int,$userName:String,$mediaId_in:[Int]){\
+    Page(page:$page, perPage:150){
+      pageInfo {
+        total
+        currentPage
+        lastPage
+        hasNextPage
+        perPage
+      }
+      mediaList(userId:$userId,userName:$userName,mediaId_in:$mediaId_in,status:CURRENT){
+        id
+        progress
+        media{
+          id 
+          title{romaji}
+          bannerImage
+          status
+          season 
+          seasonYear 
+          description 
+          type 
+          format
+          episodes 
+          duration 
+          genres 
+          averageScore 
+          popularity 
+          nextAiringEpisode{airingAt timeUntilAiring episode}
+        }
+      }
+    }
+  }
+  `
+    
+    // Fetch atleast once and as long as there is a next page
     do {
       let options = {
         method: 'POST',
         headers: {
+          'Authorization': 'Bearer ' + this.accessToken,
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         body: JSON.stringify({
-          query: this.query,
+          query: medialistQuery,
           variables: {
             page: this.page,
-            season: this.previousSeason,
-            seasonYear: this.previousYear
+            mediaId_in: animeIds,
+            userName: this.user?.name,
           }
         })
       };
@@ -175,13 +237,127 @@ export class AnilistService {
       res = await fetch(this.url, options)
         .then(this.handleResponse);
       
-      anime = [...anime, ...res.data.Page.media]
+      anime = [...anime, ...res.data.Page.mediaList]
 
       this.page++;
-    } while (res.data.Page.pageInfo.hasNextPage && this.page < 25);
+    } while (res.data.Page.pageInfo.hasNextPage && this.page < 50);
 
     return anime;
   }
+
+  async addAnimeToList(animeId: number): Promise<ListEntry> {
+    const query = `
+      mutation($mediaId: Int, $status:MediaListStatus){
+        SaveMediaListEntry (mediaId: $mediaId, status: $status) {
+          id
+          progress
+          media {
+            id 
+            title{romaji}
+            bannerImage
+            status
+            season 
+            seasonYear 
+            description 
+            type 
+            format
+            episodes 
+            duration 
+            genres 
+            averageScore 
+            popularity 
+            nextAiringEpisode{airingAt timeUntilAiring episode}
+          }
+        }
+      }
+    `
+
+    let options = {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + this.accessToken,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        query: query,
+        variables: {
+          mediaId: animeId,
+          status: "CURRENT"
+        }
+      })
+    };
+
+    let res = await fetch(this.url, options)
+      .then(this.handleResponse);
+    
+    let listEntry: ListEntry = res.data.SaveMediaListEntry;
+    return listEntry;
+  }
+
+  async deleteAnimeFromList(animeId: number): Promise<boolean> {
+    const query = `
+      mutation($id: Int){
+        DeleteMediaListEntry (id: $id) {
+          deleted
+        }
+      }
+    `
+
+    let options = {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + this.accessToken,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        query: query,
+        variables: {
+          id: animeId,
+        }
+      })
+    };
+
+    let res = await fetch(this.url, options)
+      .then(this.handleResponse);
+    
+    return res.data.DeleteMediaListEntry.deleted;
+  }
+
+  async getAuthenticatedUser(): Promise<User> {
+    const query = `
+      query{
+        Viewer{
+          id
+          name
+          avatar{
+            medium
+          }
+        }
+      }
+    `
+
+    let options = {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + this.accessToken,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        query: query,
+        variables: {
+          search: this.accessToken
+        }
+      })
+    };
+
+    let res = await fetch(this.url, options)
+      .then(this.handleResponse);
+
+    return res.data.Viewer;
+  } 
 
   private getSeasons() {
     let now = new Date();

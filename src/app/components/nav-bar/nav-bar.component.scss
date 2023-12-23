@@ -1,0 +1,104 @@
+:host {
+  height: 50px;
+  // width: 100%;
+  margin: 8px;
+  padding-inline: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 7px;
+  background: rgb(27, 27, 27);
+}
+
+#aniListUser {
+  height: 40px;
+  padding-inline: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  background-color: rgb(58, 58, 58);
+  transition: all 0.3s;
+
+  &:hover {
+    background-color: rgb(75, 75, 75);
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  a {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  span {
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+
+  img {
+    height: 34px;
+    width: 34px;
+    border-radius: 50%;
+  }
+
+  svg {
+    height: 1.1em;
+    width: 1.1em;
+  }
+}
+
+ul {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  list-style: none;
+
+  --underline-offset-x: 0;
+  --underline-width: 0;
+
+  &::before {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 0;
+    height: 4px;
+    width: var(--underline-width);
+    transform: translateX(var(--underline-offset-x));
+    background-color: rgb(206, 1, 103);
+    transition: transform 0.5s, width 0.5s;
+    border-radius: 4px;
+  }
+}
+
+li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+a {
+  font-size: 1.2em;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.activeLink {
+  color: rgb(206, 1, 103);
+
+  // &::after {
+  //   content: "";
+  //   display: block;
+  //   position: relative;
+  //   bottom: 10;
+  //   height: 4px;
+  //   // width: var(--underline-width);
+  //   transform: translateX(var(--underline-offset-x));
+  //   background-color: rgb(206, 1, 103);
+  //   transition: transform 0.5s, width 0.5s;
+  //   border-radius: 4px;
+  // }
+}
