@@ -10,6 +10,11 @@ import { WatchlistService } from 'src/app/services/watchlist.service';
 })
 export class SchedulePageComponent implements OnInit {
 
+  loading: boolean = false;
+  error: { isError: boolean, errorText: string } = {
+    isError: false,
+    errorText: ''
+  };
   week: Anime[][] = [[], [], [], [], [], [], []];
   weekNotOnWatchlist: Anime[][] = [[], [], [], [], [], [], []];
   weekOnWatchlist: Anime[][] = [[], [], [], [], [], [], []];
@@ -20,18 +25,29 @@ export class SchedulePageComponent implements OnInit {
   constructor(private anilist: AnilistService, private watchlistService: WatchlistService) { }
 
   async ngOnInit(): Promise<void> {
-    let res: Anime[] = await this.anilist.getAnime(); 
-    console.log("schedule res", res);
-    this.groupAnime(res);
-    console.log(this.week);
-    
-    this.watchlistService.getWatchlist(res.map(entry => entry.id));
+    this.loading = true;
 
-    this.watchlistService._watchList.subscribe(watchList => {
-      this.watchlist = watchList;
-      console.log("wl", this.watchlist);
-      this.groupByWatchlist(watchList);
-    });
+    this.anilist.getAnime()
+      .then((res: Anime[]) => {
+        console.log("schedule res", res);
+        this.groupAnime(res);
+        console.log(this.week);
+        this.loading = false;
+
+        this.watchlistService.getWatchlist(res.map(entry => entry.id));
+
+        this.watchlistService._watchList.subscribe(watchList => {
+          this.watchlist = watchList;
+          console.log("wl", this.watchlist);
+          this.groupByWatchlist(watchList);
+        });
+      })
+      .catch(err => {
+        this.loading = false;
+
+        this.error.isError = true;
+        this.error.errorText = `Status ${err.errors[0].status}: ${err.errors[0].message}`;
+      })
   }
 
   sortAnime(fetchedAnime: Anime[], day: number) {

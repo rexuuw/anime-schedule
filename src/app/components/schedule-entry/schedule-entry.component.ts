@@ -24,8 +24,8 @@ export class ScheduleEntryComponent implements OnInit {
     this.releaseDate = new Date((this.anime?.nextAiringEpisode?.airingAt || 0 + 3600) * 1000);
     this.dayDiff = Math.ceil(Math.abs(this.releaseDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) - 1;
 
-    this.banner = `background-image: url(${this.anime?.bannerImage}); background-image: linear-gradient(-90deg, rgba(46, 46, 46, 0.5), rgba(10, 10, 10, 0.9) 70%), url(${this.anime?.bannerImage});`
-    
+    this.banner = `background-image: linear-gradient(-90deg, rgba(46, 46, 46, 0.5), rgba(10, 10, 10, 0.9) 70%), url(${this.anime?.bannerImage || this.anime?.coverImage?.large});`
+
     this.watchlistService._watchList.subscribe(watchList => {
       let index = watchList.findIndex(entry => entry.media.id === (this.anime?.id || -1));
       this.onWatchlist = index > -1;
@@ -56,6 +56,17 @@ export class ScheduleEntryComponent implements OnInit {
 
   public toggleWatchlist() {
     this.watchlistService.toggleWatchlist(this.anime, this.onWatchlist);
+  }
+
+  calculateProgress() {
+    if (this.anime?.episodes) {
+      return (((this.anime?.nextAiringEpisode?.episode || 0) - 1) / this.anime?.episodes) * 100;
+    }
+    else if (!this.anime?.nextAiringEpisode?.episode) {
+      return 0;
+    }
+    
+    return 25;
   }
 
 }

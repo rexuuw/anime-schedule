@@ -75,3 +75,50 @@
     height: 1.5em;
   }
 }
+
+.loadingWrapper {
+  grid-column: 1/-1;
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loadingSpinner {
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+  border: 2px solid rgb(206, 1, 103);
+  border-top: 1px solid transparent;
+  animation: spin 1s infinite linear;
+}
+
+.errorWrapper {
+  grid-column: 1/-1;
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.error {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 7px;
+  border: 1px solid rgb(190, 0, 0);
+  background-color: rgba(190, 0, 0, 0.1);
+
+  svg {
+    margin-right: 5px;
+    fill: #fff;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

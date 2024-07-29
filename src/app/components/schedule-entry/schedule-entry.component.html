@@ -6,7 +6,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
       </svg>      
     </button>
-    <img [src]="anime?.coverImage?.large" alt="#"/>
+    <img [src]="anime?.coverImage?.large" class="coverImg" alt="#"/>
     <div class="title">
         <a [href]="watchLink" target="_blank" *ngIf="watchLink; else title" [title]="anime?.title?.romaji">{{anime?.title?.romaji}}</a>
         <ng-template #title> 
@@ -14,23 +14,23 @@
         </ng-template>
         <div class="titleDetails">
           <span>{{ releaseDate | date:"HH:mm" }}</span>
-          • 
-          <div *ngIf="anime?.averageScore">
-            <span>{{ (anime?.averageScore || 0) / 10 | number:"1.2" }}</span>
-            •
+          <div *ngIf="anime?.averageScore" class="titleDetailsScore">
+            • 
+            <span>{{ (anime?.averageScore || 0) / 10 | number:"1.1" }}</span>
           </div>
-          <div>
-            <span *ngIf="onWatchlist">[{{ progress }}]&#160;</span><span>{{ (anime?.nextAiringEpisode?.episode || 0) - 1 }}</span>/<span>{{anime?.episodes || "?"}}</span> Ep.
+          <div class="episodeNumber">
+            •
+            <span *ngIf="onWatchlist">[{{ progress }}]&#160;</span><span>{{ (anime?.nextAiringEpisode?.episode || 0) - 1 }}</span>/<span>{{anime?.episodes || "?"}}</span>
           </div> 
         </div>
     </div>
-    <button class="expandButton" (click)="toggleWatchlist()">
+    <button class="expandButton addButton" (click)="toggleWatchlist()">
       <span *ngIf="onWatchlist; else notOnWatchlist">-</span>
       <ng-template #notOnWatchlist>+</ng-template>
     </button>
   </div>
   <div class="progress">
-    <div class="progressbar" [ngStyle]="{'width': (!expanded) ? '0%' : (((anime?.nextAiringEpisode?.episode || 0) - 1) / (anime?.episodes || 12) * 100) + '%'}"> </div>
+    <div class="progressbar" [ngStyle]="{'width': (!expanded) ? '0%' : calculateProgress() + '%'}"> </div>
   </div>
   <div class="information">
     <span class="score">
@@ -38,7 +38,7 @@
       <p>Score</p>
     </span>
     <span class="episodes">
-      <p>{{ (anime?.nextAiringEpisode?.episode || 0) - 1 }} / {{ anime?.episodes || "?" }}</p>
+      <p><span *ngIf="onWatchlist">[{{ progress }}]&#160;</span>{{ (anime?.nextAiringEpisode?.episode || 0) - 1 }} / {{ anime?.episodes || "?" }}</p>
       <p>Episodes</p>
     </span>
     <span class="genres">

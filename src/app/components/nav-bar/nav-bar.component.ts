@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { User } from 'src/app/models/user.model';
 import { AnilistService } from 'src/app/services/anilist.service';
@@ -9,11 +9,20 @@ import { AnilistService } from 'src/app/services/anilist.service';
   styleUrls: ['./nav-bar.component.scss']
 })
 export class NavBarComponent implements OnInit {
+  @HostListener('window:scroll', [])
+  onScroll(): void {
+    if (window.scrollY > 0) {
+      this.stuck = true;
+    } else {
+      this.stuck = false;
+    }
+  }
 
   @ViewChild('navList') menu?: ElementRef;
   @ViewChild('.activeLink') activeLink?: ElementRef;
 
   user?: User;
+  stuck: boolean = false;
 
   constructor(private route: ActivatedRoute, private anilistService: AnilistService) { }
 
